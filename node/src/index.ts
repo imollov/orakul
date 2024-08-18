@@ -2,6 +2,12 @@ import { ethers } from 'ethers'
 import * as dotenv from 'dotenv'
 dotenv.config()
 
+import * as jobs from './jobs'
+import { JobRegistry } from './types'
+
+const jobRegistry: JobRegistry = Object.values(jobs).reduce((acc, job) => ({ ...acc, [job.id]: job }), {})
+console.log('Job registry:', jobRegistry)
+
 import OracleArtifact from './abi/Oracle.json'
 
 const RPC_URL = process.env.RPC_URL || 'http://localhost:8545'
@@ -12,7 +18,7 @@ const provider = new ethers.JsonRpcProvider(RPC_URL)
 const wallet = new ethers.Wallet(PRIVATE_KEY, provider)
 const oracleContract = new ethers.Contract(ORACLE_ADDRESS, OracleArtifact.abi, wallet)
 
-const oracleRequestListener = async () => {
+const oracleRequestListener = async (jobRegistry: JobRegistry) => {
   console.log('Listening for OracleRequest events on Oracle contract:', ORACLE_ADDRESS)
 
   oracleContract.on(
@@ -23,7 +29,12 @@ const oracleRequestListener = async () => {
       console.log('requesterAddress:', requesterAddress)
 
       console.log('Running job with id', jobId, 'and args', jobArgs)
-      const jobResult = multiplyNumJob(jobArgs)
+      const job = jobRegistry[jobId]
+      if (!job) {
+        console.error('Job not found:', jobId)
+        return
+      }
+      const jobResult = await job.run(jobArgs)
       console.log('Job result:', jobResult)
 
       console.log('Fulfilling OracleRequest...')
@@ -35,14 +46,6 @@ const oracleRequestListener = async () => {
   )
 }
 
-const multiplyNumJob = (args: string) => {
-  const argsDecoded = new ethers.AbiCoder().decode(['uint256'], args)
-  const num = BigInt(argsDecoded[0])
-  const result = num * 2n
-  const resultBytes = new ethers.AbiCoder().encode(['uint256'], [result])
-  return resultBytes
-}
-
-oracleRequestListener().catch((error) => {
+oracleRequestListener(jobRegistry).catch((error) => {
   console.error('Error:', error)
 })
