@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 
-import { Job } from '../types'
+import { Job, JobRegistry } from '../types'
 
 type JobParams = {
   name: string
@@ -14,3 +14,6 @@ export const asJob = ({ name, fn }: JobParams): Job => {
     id: ethers.encodeBytes32String(name),
   }
 }
+
+export const registerJobs = (jobModules: Record<string, Job>): JobRegistry =>
+  Object.values(jobModules).reduce((acc, job) => ({ ...acc, [job.id]: job }), {})
