@@ -1,0 +1,62 @@
+{
+  "id": "3fb8ffca-db8a-4e21-b4b1-e85d42bebf45",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.requests": {
+      "name": "requests",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "requestId": {
+          "name": "requestId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "jobid": {
+          "name": "jobid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "jobArgs": {
+          "name": "jobArgs",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "requesterAddress": {
+          "name": "requesterAddress",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
