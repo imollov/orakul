@@ -64,9 +64,14 @@ COPY package.json .
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/dist ./dist
 
+# Copy migration files
+COPY drizzle ./drizzle
 
 # Expose the port that the application listens on.
 EXPOSE 8000
+
+# Run migrations
+CMD npm run migrate
 
 # Run the application.
 CMD npm start

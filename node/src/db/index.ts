@@ -7,6 +7,6 @@ import * as schema from './schema'
 
 const DATABASE_URL = process.env.DB_URL || 'Unset databse URL'
 
-const queryClient = postgres(DATABASE_URL)
+export const connection = postgres(DATABASE_URL)
 
-export const db = drizzle(queryClient, { schema })
+export const db = drizzle(connection, { schema })

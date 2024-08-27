@@ -9,7 +9,8 @@
     "build:watch": "tsc -w",
     "start": "node dist/index.js",
     "lint": "eslint 'src/**/*.{ts,js}'",
-    "format": "prettier --write 'src/**/*.{ts,js,json,md}'"
+    "format": "prettier --write 'src/**/*.{ts,js,json,md}'",
+    "migrate": "node dist/db/migrate.js"
   },
   "author": "",
   "license": "ISC",
