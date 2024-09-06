@@ -1,13 +1,14 @@
-import { ethers } from 'ethers'
 import { asJob } from '../core/job'
 
+/**
+ * A sample job that doubles an input number.
+ */
 export const sampleJob = asJob({
-  name: 'Sample Job',
-  fn: async (args: string) => {
-    const argsDecoded = new ethers.AbiCoder().decode(['uint256'], args)
-    const num = BigInt(argsDecoded[0])
-    const result = num * 2n
-    const resultBytes = new ethers.AbiCoder().encode(['uint256'], [result])
-    return new Promise((resolve) => resolve(resultBytes))
+  name: 'Sample Job', // Unique name for the job
+  inputTypes: ['uint256'], // Solidity type for input args
+  outputTypes: ['uint256'], // Solidity type for the result
+  fn: async (decodedArgs: unknown[]) => {
+    const [num] = decodedArgs as [bigint]
+    return num * 2n
   },
 })

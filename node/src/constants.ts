@@ -1,1 +1,1 @@
-export const ORACLE_REQUEST_EVENT = 'OracleRequest'
+export const ORACLE_REQUEST_EVENT_NAME = 'OracleRequest'
