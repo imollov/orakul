@@ -3,12 +3,11 @@ import { asJob } from '../core/job'
 /**
  * A sample job that doubles an input number.
  */
-export const sampleJob = asJob({
-  name: 'Sample Job', // Unique name for the job
-  inputTypes: ['uint256'], // Solidity type for input args
-  outputTypes: ['uint256'], // Solidity type for the result
-  fn: async (decodedArgs: unknown[]) => {
-    const [num] = decodedArgs as [bigint]
+export const sampleJob = asJob<bigint, bigint>({
+  name: 'Double Number',
+  inputTypes: ['uint256'],
+  outputTypes: ['uint256'],
+  fn: async (num) => {
     return num * 2n
   },
 })

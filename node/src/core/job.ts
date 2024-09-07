@@ -1,48 +1,46 @@
 import { ethers } from 'ethers'
 
 /**
- * Parameters to create a Job instance.
+ * A type alias for a function that processes job arguments and returns a result.
  */
-export type JobParams = {
+export type JobFunction<TArgs, TResult> = (decodedArgs: TArgs) => Promise<TResult>
+
+/**
+ * Parameters to create a Job instance with type safety.
+ */
+export type JobParams<TArgs, TResult> = {
   name: string // Unique name for the job
   inputTypes: string[] // Solidity types for input args
   outputTypes: string[] // Solidity types for output
-  fn: (decodedArgs: unknown[]) => Promise<unknown> // Function to execute
+  fn: JobFunction<TArgs, TResult> // Function to execute with typed args and result
 }
 
 /**
- * Factory function to create a Job instance.
+ * Factory function to create a Job instance with type safety.
  */
-export const asJob = ({ name, inputTypes, outputTypes, fn }: JobParams): Job => {
-  const id = ethers.encodeBytes32String(name)
-  return new Job(id, name, inputTypes, outputTypes, fn)
+export const asJob = <TArgs, TResult>(params: JobParams<TArgs, TResult>): Job<TArgs, TResult> => {
+  return new Job(params)
 }
 
 /**
  * Registers a set of jobs and returns a JobRegistry.
  */
-export const registerJobs = (jobModules: Record<string, Job>) => {
+export const registerJobs = (jobModules: Record<string, Job<any, any>>) => {
   return new JobRegistry(jobModules)
 }
 
 /**
  * Represents a job with input/output Solidity types and a function to execute.
  */
-export class Job {
+export class Job<TArgs = unknown, TResult = unknown> {
   id: string
   name: string
-  inputTypes: string[] // Solidity types for decoding input args
-  outputTypes: string[] // Solidity types for encoding result
-  fn: (decodedArgs: unknown[]) => Promise<unknown>
+  inputTypes: string[]
+  outputTypes: string[]
+  fn: JobFunction<TArgs, TResult>
 
-  constructor(
-    id: string,
-    name: string,
-    inputTypes: string[],
-    outputTypes: string[],
-    fn: (decodedArgs: unknown[]) => Promise<unknown>,
-  ) {
-    this.id = id
+  constructor({ name, inputTypes, outputTypes, fn }: JobParams<TArgs, TResult>) {
+    this.id = ethers.encodeBytes32String(name)
     this.name = name
     this.inputTypes = inputTypes
     this.outputTypes = outputTypes
@@ -55,7 +53,7 @@ export class Job {
    * @returns The encoded result.
    */
   async run(encodedArgs: string): Promise<string> {
-    const decodedArgs = new ethers.AbiCoder().decode(this.inputTypes, encodedArgs)
+    const decodedArgs = new ethers.AbiCoder().decode(this.inputTypes, encodedArgs) as TArgs
     const result = await this.fn(decodedArgs)
     return new ethers.AbiCoder().encode(this.outputTypes, [result])
   }
@@ -65,7 +63,7 @@ export class Job {
  * Manages a registry of jobs.
  */
 export class JobRegistry {
-  private registry: Record<string, Job> = {}
+  private registry: Map<string, Job> = new Map()
 
   constructor(jobModules: Record<string, Job>) {
     this.registerJobs(jobModules)
@@ -76,7 +74,7 @@ export class JobRegistry {
    */
   private registerJobs(jobModules: Record<string, Job>) {
     Object.values(jobModules).forEach((job) => {
-      this.registry[job.id] = job
+      this.registry.set(job.id, job)
     })
   }
 
@@ -84,14 +82,28 @@ export class JobRegistry {
    * Retrieves a job by its ID.
    */
   getJob(jobId: string): Job | undefined {
-    return this.registry[jobId]
+    return this.registry.get(jobId)
+  }
+
+  /**
+   * Deletes a job by its ID.
+   */
+  deleteJob(jobId: string): boolean {
+    return this.registry.delete(jobId)
+  }
+
+  /**
+   * Checks if a job exists by its ID.
+   */
+  hasJob(jobId: string): boolean {
+    return this.registry.has(jobId)
   }
 
   /**
    * Lists the details of all registered jobs.
    */
   listJobDetails() {
-    return Object.values(this.registry).map((job) => ({
+    return Array.from(this.registry.values()).map((job) => ({
       id: job.id,
       name: job.name,
     }))

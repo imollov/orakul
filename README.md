@@ -162,12 +162,20 @@ touch jobs/my-job.ts
 ```typescript
 import { asJob } from "../core/job";
 
-export const myJob = asJob({
-  name: 'Sample Job',
-  fn: async (args: string) => {
+export const myJob = asJob<bigint, bigint>({
+  name: 'My custom job',
+  inputTypes: ['uint256'],
+  outputTypes: ['uint256'],
+  fn: async (arg) => {
     // Implement the job logic
   }
 ```
+
+Notes:
+
+- The `arg` parameter is the data passed from the client contract.
+- The types of the arguments and return values can be customized by changing the generic types of the `asJob` function.
+- Input and output types specify the Solidity types that will be used for encoding and decoding the data.
 
 4. Add the job to the registry in the `jobs/index.ts` file:
 
