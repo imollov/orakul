@@ -1,41 +1,50 @@
 # Orakul: Blockchain Oracle Solution
 
-> :warning: **This project is a work in progress and not ready for production use.**
+> 🚧 **This project is a work in progress and not ready for production use.**
 
-Orakul is a complete oracle solution for Ethereum smart contracts. It solves the problem of connecting smart contracts with external data sources like APIs. Main goal is to provide a dead simple and flexible way to to achieve this with minimal effort and cost.
+Orakul is a complete oracle solution for Ethereum-compatible blockchains, addressing the challenge of connecting smart contracts with external data sources like APIs. Its main goal is to provide a simple and flexible way to achieve this with minimal effort and cost.
 
-Third party services like Chainlink and Gelato are great, but they come with a cost and might not be ideal for simple or bootstrapped projects. Orakul is a self-hosted solution that can be deployed anywhere and used for free. It is designed to be simple and easy to use, but also flexible and extensible. It is built with TypeScript and Solidity and can be used with any Ethereum-compatible blockchain. In future it could be rewritten in Go or Rust for better performance and scalability.
+While third-party services like Chainlink and Gelato are powerful, they may not offer the level of control and customization you need. They can also be expensive or complex to use. Orakul is designed to be both simple and flexible, offering a free and open-source alternative that you can run on your own infrastructure and extend as needed.
 
 ## Table of Contents
 
-- [Features](#features)
-- [Components](#components)
-- [Prerequisites](#prerequisites)
+- [Roadmap](#roadmap)
 - [Usage](#usage)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
   - [Deploy Oracle Contract](#deploy-oracle-contract)
-  - [Use Oracle Contract](#use-oracle-contract)
+  - [Run Oracle Node](#run-oracle-node)
+  - [Develop Client Contract](#develop-client-contract)
   - [Develop Custom Jobs](#develop-custom-jobs)
-  - [Deploy Oracle Node](#deploy-oracle-node)
+- [Examples](#examples)
+  - [Weather Data Consumer](#weather-data-consumer)
 - [Guides](#guides)
   - [Deploy to AWS](#deploy-to-aws)
 - [Contributing](#contributing)
 - [License](#license)
 
-## Features
+## Roadmap
 
-- [x] Request data from external APIs
-- [x] Define custom jobs to process data
-- [x] Deploy anywhere with Docker
-- [ ] Dashboard for monitoring
-- [ ] Muli-node support
-- [ ] Scheduled jobs
+- [x] Request external data from smart contracts
+- [x] Develop custom jobs to process data
+- [x] Run on your own infrastructure
+- [ ] Dashboard for monitoring and managing jobs
+- [ ] Multi-node support for high availability
+- [ ] ZK proofs for data verification
+- [ ] Job scheduling and automation
+- [ ] Randomness generation
+- [ ] Price feeds
 
-## Components
+## Usage
 
-- Oracle contracts
-- Oracle node
+The solution consists of two main components:
 
-## Prerequisites
+- **Oracle contract**: Smart contract that acts as a bridge between the blockchain and the external world.
+- **Oracle node**: Server application that listens for oracle request events and executes the corresponding jobs.
+
+You first need to deploy the Oracle contract and develop a client contract that interacts with it. Afterward, you must run the node application, configured with the contract address and funded with enough tokens to cover gas fees. You can also create custom jobs that the node can execute. See the instructions below for more details.
+
+### Prerequisites
 
 - Node.js
 - npm
@@ -43,12 +52,12 @@ Third party services like Chainlink and Gelato are great, but they come with a c
 - Wallet
 - RPC provider
 
-## Usage
+### Installation
 
 Clone the repository:
 
 ```bash
-git clone git@github.com:imollov/blockchain-oracle.git
+git clone git@github.com:imollov/orakul.git
 ```
 
 ### Deploy Oracle Contract
@@ -77,7 +86,21 @@ cp .env.example .env
 npx hardhat run scripts/deploy_oracle.js --network <NETWORK>
 ```
 
-### Use Oracle Contract
+### Run Oracle Node
+
+1. Create a `.env` file using the template and fill in the required values:
+
+```bash
+cp .env.example .env
+```
+
+2. Deploy the Oracle node:
+
+```bash
+docker compose up --build -d
+```
+
+### Develop Client Contract
 
 1. Import the Oracle client interface in your contract:
 
@@ -152,19 +175,11 @@ export const myJob = asJob({
 export * from "./my-job";
 ```
 
-### Deploy Oracle Node
+## Examples
 
-1. Create a `.env` file using the template and fill in the required values:
+### Weather Data Consumer
 
-```bash
-cp .env.example .env
-```
-
-2. Deploy the Oracle node:
-
-```bash
-docker compose up --build -d
-```
+// TODO
 
 ## Guides
 
@@ -218,7 +233,6 @@ docker run --env-file .env imollov/blockchain-oracle
 🔗 Oracle contract...
 👷🏼 Job registry...
 🚀 Starting job client...
-ℹ️ Listening for OracleRequest events...
 ```
 
 ## Contributing
