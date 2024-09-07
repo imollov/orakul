@@ -94,10 +94,18 @@ npx hardhat run scripts/deploy_oracle.js --network <NETWORK>
 cp .env.example .env
 ```
 
-2. Deploy the Oracle node:
+2. Start the node:
 
 ```bash
-docker compose up --build -d
+docker compose up --build
+```
+
+3. If everything is correct, you should see the following output:
+
+```
+🔗 Oracle contract...
+👷🏼 Job registry...
+🚀 Starting job client...
 ```
 
 ### Develop Client Contract
@@ -218,19 +226,28 @@ npx hardhat run scripts/deploy_weather_consumer.js --network <NETWORK>
 
 ### Deploy to AWS
 
-1. Create a new EC2 instance: Amazon Linux and t2.micro instance type.
+1. Create a new **EC2 instance**.
 
-2. In advance details, add the following user data:
+2. Choose **Amazon Linux** as the OS and **t2.micro** as the instance type for free-tier eligibility.
+
+3. Configure the security group to allow SSH access only.
+
+4. In advanced details, add the following user data to install Docker, Git, and Docker Compose:
 
 ```bash
 #!/bin/bash
-
+# Install Docker
 sudo yum install docker -y
 sudo systemctl start docker
 sudo systemctl enable docker
-```
 
-3. Create a new key pair and allow SSH only.
+# Install Git
+sudo yum install git -y
+
+# Install Docker Compose
+sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
 
 4. Launch the instance.
 
@@ -242,30 +259,37 @@ sudo systemctl enable docker
 sudo su
 ```
 
-7. Check docker version:
+7. Clone the repository and navigate to the node directory:
 
 ```bash
-docker --version
+git clone git@github.com:imollov/orakul.git
+cd orakul/node
 ```
 
-8. Create `.env` file using the template from the repository. Use your preferred text editor, for example:
+8. Create a .env file using the provided template:
+
+```bash
+cp .env.example .env
+```
+
+9. Use a text editor like nano to edit the .env file:
 
 ```bash
 nano .env
 ```
 
-9. Deploy the image from Docker Hub:
+Fill in the required values, such as the RPC URL, Private key, and Oracle contract address.
+
+10. Deploy the Oracle node using Docker Compose:
 
 ```bash
-docker run --env-file .env imollov/blockchain-oracle
+docker-compose up --build -d
 ```
 
-10. If everything is correct, you should see the following output:
+11. Check if the Oracle node is running:
 
-```
-🔗 Oracle contract...
-👷🏼 Job registry...
-🚀 Starting job client...
+```bash
+docker-compose ps
 ```
 
 ## Contributing
