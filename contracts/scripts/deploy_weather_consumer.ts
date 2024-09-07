@@ -17,24 +17,21 @@ async function main() {
   // manually to make sure everything is compiled
   // await hre.run('compile');
 
-  // Retrieve authorized nodes and requesters from .env
-  const authorizedNodes: string[] = process.env.AUTHORIZED_NODES
-    ? process.env.AUTHORIZED_NODES.split(",")
-    : [];
-  const authorizedRequesters: string[] = process.env.AUTHORIZED_REQUESTERS
-    ? process.env.AUTHORIZED_REQUESTERS.split(",")
-    : [];
+  // Retrieve oracle address from .env
+  const oracleAddress = process.env.ORACLE_CONTRACT_ADDRESS || "";
+  if (!oracleAddress) {
+    throw new Error("ORACLE_CONTRACT_ADDRESS not found in .env");
+  }
 
   // Deploy the Oracle contract
-  const oracleFactory = await ethers.getContractFactory("Oracle");
-  const oracle = await oracleFactory.deploy(
-    authorizedNodes,
-    authorizedRequesters
+  const weatherConsumerFactory = await ethers.getContractFactory(
+    "WeatherConsumer"
   );
-  await oracle.waitForDeployment();
-  const oracleAddress = await oracle.getAddress();
+  const weatherConsumer = await weatherConsumerFactory.deploy(oracleAddress);
+  await weatherConsumer.waitForDeployment();
+  const weatherConsumerAddress = await weatherConsumer.getAddress();
 
-  console.log("Oracle deployed to:", oracleAddress);
+  console.log("WeatherConsumer deployed to:", weatherConsumerAddress);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

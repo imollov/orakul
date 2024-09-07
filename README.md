@@ -187,7 +187,32 @@ export * from "./my-job";
 
 ### Weather Data Consumer
 
-// TODO
+- **Contract**: [WeatherConsumer.sol](./contracts/contracts/examples/WeatherConsumer.sol)
+- **Job**: [weather.ts](./node/src/jobs/weather.ts)
+
+This example demonstrates how to request weather data from an external API and return the temperature to the client contract.
+
+1. Deploy the WeatherConsumer contract:
+
+```bash
+npx hardhat run scripts/deploy_weather_consumer.js --network <NETWORK>
+```
+
+2. Once deployed, call the `authorizeRequester` function from the Oracle contract owner account to authorize the WeatherConsumer contract.
+
+3. Call the `requestData` function from the WeatherConsumer contract to request weather data with specific coordinates.
+
+4. If the request is successful, the Oracle node will execute the `weatherJob` and return the temperature and you should see the following output:
+
+```
+📋 New OracleRequest event...
+ℹ️ Getting weather data from API for lat: 51.5074 and long: 0.1278
+ℹ️ Current temperature: 20.2
+ℹ️ Fulfilling OracleRequest...
+✅ OracleRequest fulfilled...
+```
+
+5. The WeatherConsumer contract will receive the temperature and you can check it by calling the `getWeatherResult` function with the request ID.
 
 ## Guides
 
