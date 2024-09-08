@@ -70,8 +70,5 @@ COPY drizzle ./drizzle
 # Expose the port that the application listens on.
 EXPOSE 8000
 
-# Run migrations
-CMD npm run migrate
-
-# Run the application.
-CMD npm start
+# Run the migration and start the application.
+CMD npm run migrate && npm start
